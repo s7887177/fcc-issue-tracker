@@ -1,32 +1,31 @@
 'use strict';
-
+// const {AwaitLock} = require('await-lock');
 const express     = require('express');
 const bodyParser  = require('body-parser');
 const expect      = require('chai').expect;
 const cors        = require('cors');
 require('dotenv').config();
-
+const { MongoClient }   = require('mongodb');
 const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
 const runner            = require('./test-runner');
-
+const uri         = process.env.MONGO_URI;
 let app = express();
+// const lock = new AwaitLock();
+const client = new MongoClient(uri);
+app.issueDB = client.db('issue-tracker-db');
+client.connect();
 
+// lock.acquireAsync();
 app.use('/public', express.static(process.cwd() + '/public'));
-
 app.use(cors({origin: '*'})); //For FCC testing purposes only
-
-
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 //Sample front-end
 app.route('/:project/')
   .get(function (req, res) {
     res.sendFile(process.cwd() + '/views/issue.html');
   });
-
 //Index page (static HTML)
 app.route('/')
   .get(function (req, res) {
@@ -45,7 +44,6 @@ app.use(function(req, res, next) {
     .type('text')
     .send('Not Found');
 });
-
 //Start our server and tests!
 const listener = app.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
@@ -61,5 +59,4 @@ const listener = app.listen(process.env.PORT || 3000, function () {
     }, 3500);
   }
 });
-
 module.exports = app; //for testing

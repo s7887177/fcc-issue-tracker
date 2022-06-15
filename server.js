@@ -10,6 +10,7 @@ const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
 const runner            = require('./test-runner');
 const uri         = process.env.MONGO_URI;
+console.log(uri);
 let app = express();
 // const lock = new AwaitLock();
 const client = new MongoClient(uri);

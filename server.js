@@ -1,4 +1,9 @@
 'use strict';
+const https = require('https');
+const fs = require('fs');
+const privkey = fs.readFileSync('privkey.pem');
+const certificate = fs.readFileSync('cert.pem');
+const credentials = {key: privkey, cert: certificate};
 // const {AwaitLock} = require('await-lock');
 const express     = require('express');
 const bodyParser  = require('body-parser');
@@ -46,7 +51,8 @@ app.use(function(req, res, next) {
     .send('Not Found');
 });
 //Start our server and tests!
-const listener = app.listen(process.env.PORT || 3000, function () {
+const httpServer = https.createServer(credentials, app);
+const listener = httpServer.listen(process.env.PORT || 3000, function () {
   console.log('Your app is listening on port ' + listener.address().port);
   if(process.env.NODE_ENV==='test') {
     console.log('Running Tests...');
